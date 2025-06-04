@@ -1,0 +1,322 @@
+#include <iostream>
+#include <string>
+#include <list>
+#include <map>
+#include <unordered_set>
+#include <stdexcept>
+#include <iterator>
+#include <sstream>
+
+using namespace std;
+
+class LexicalError : public runtime_error {
+public:
+    explicit LexicalError(const string& msg) : runtime_error(msg) {}
+};
+
+enum class CharType {
+    Digit,
+    Letter,
+    Underscore,
+    RelOp,
+    LogOp,
+    Symbol,
+    Dot,
+    Space,
+    Other
+};
+
+CharType charType(char c) {
+    if (c >= '0' && c <= '9') return CharType::Digit;
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) return CharType::Letter;
+    if (c == '_') return CharType::Underscore;
+    if (c == '=' || c == '<' || c == '>' || c == '!') return CharType::RelOp;
+    if (c == '&' || c == '|') return CharType::LogOp;
+    if (c == '+' || c == '-' || c == '*' || c == '/' ||
+        c == '(' || c == ')' || c == '{' || c == '}' ||
+        c == ';' || c == ',') return CharType::Symbol;
+    if (c == '.') return CharType::Dot;
+    if (c == ' ') return CharType::Space;
+    return CharType::Other;
+}
+
+bool isDigit(char c) { return charType(c) == CharType::Digit; }
+bool isLetter(char c) { return charType(c) == CharType::Letter; }
+bool isUnderscore(char c) { return charType(c) == CharType::Underscore; }
+bool isDigitOrLetter(char c) {
+    CharType t = charType(c);
+    return t == CharType::Digit || t == CharType::Letter || t == CharType::Underscore;
+}
+bool isRelOp(char c) { return charType(c) == CharType::RelOp; }
+bool isLogOp(char c) { return charType(c) == CharType::LogOp; }
+bool isSymbol(char c) { return charType(c) == CharType::Symbol; }
+bool isDot(char c) { return charType(c) == CharType::Dot; }
+bool isSpace(char c) { return charType(c) == CharType::Space; }
+
+class Scanner {
+public:
+    void run() {
+        load();
+        filter();
+
+        while (true) {
+            string unit = fetch();
+            if (unit.empty()) break;
+            mark(unit);
+        }
+
+        for (const auto& e : records) {
+            cout << e.first << " " << e.second << endl;
+        }
+    }
+
+private:
+    string raw;
+    int idx = 0;
+    list<pair<string, string>> records;
+
+    const map<string, string> dict1 = {
+        {"int", "INTSYM"}, {"double", "DOUBLESYM"}, {"scanf", "SCANFSYM"}, {"printf", "PRINTFSYM"},
+        {"if", "IFSYM"}, {"then", "THENSYM"}, {"while", "WHILESYM"}, {"do", "DOSYM"}
+    };
+
+    const map<string, string> dict2 = {
+        {"=", "AO"}, {"==", "RO"}, {">", "RO"}, {">=", "RO"}, {"<", "RO"}, {"<=", "RO"},
+        {"!=", "RO"}, {"||", "LO"}, {"&&", "LO"}, {"!", "LO"},
+        {"+", "PLUS"}, {"-", "MINUS"}, {"*", "TIMES"}, {"/", "DIVISION"},
+        {",", "COMMA"}, {"(", "BRACE"}, {")", "BRACE"}, {"{", "BRACE"}, {"}", "BRACE"}, {";", "SEMICOLON"}
+    };
+
+    const unordered_set<string> relational_ops = { "==", "!=", "<", "<=", ">", ">=" };
+    const unordered_set<string> logical_ops = { "&&", "||", "!" };
+    const unordered_set<string> arith_ops = { "+", "-", "*", "/" };
+
+    void load() {
+        ostringstream oss;
+        istreambuf_iterator<char> begin(cin), end;
+        while (begin != end) {
+            oss.put(*begin++);
+        }
+        raw = oss.str();
+    }
+
+    void filter() {
+        enum class Mode { NORMAL, BLOCK_COMMENT, LINE_COMMENT };
+
+        Mode mode = Mode::NORMAL;
+        string buffer;
+        buffer.reserve(raw.size());
+
+        for (size_t i = 0; i < raw.size(); ++i) {
+            char ch = raw[i];
+            switch (mode) {
+                case Mode::NORMAL:
+                    if (ch == '/' && i + 1 < raw.size() && raw[i + 1] == '*') {
+                        mode = Mode::BLOCK_COMMENT;
+                        ++i;
+                    } else if (ch == '/' && i + 1 < raw.size() && raw[i + 1] == '/') {
+                        mode = Mode::LINE_COMMENT;
+                        ++i;
+                    } else {
+                        buffer.push_back(ch);
+                    }
+                    break;
+
+                case Mode::BLOCK_COMMENT:
+                    if (ch == '*' && i + 1 < raw.size() && raw[i + 1] == '/') {
+                        mode = Mode::NORMAL;
+                        ++i;
+                    }
+                    break;
+
+                case Mode::LINE_COMMENT:
+                    if (ch == '\n') {
+                        buffer.push_back('\n');
+                        mode = Mode::NORMAL;
+                    }
+                    break;
+            }
+        }
+
+        if (mode == Mode::BLOCK_COMMENT) {
+            throw LexicalError("Unclosed block comment.");
+        }
+
+        for (char& c : buffer) {
+            if (c == '\t' || c == '\r' || c == '\n') c = ' ';
+        }
+
+        raw.clear();
+        raw.reserve(buffer.size());
+
+        bool prevSpace = true;
+        for (char c : buffer) {
+            if (c == ' ') {
+                if (!prevSpace) {
+                    raw.push_back(' ');
+                    prevSpace = true;
+                }
+            } else {
+                raw.push_back(c);
+                prevSpace = false;
+            }
+        }
+    }
+
+    string fetch() {
+        return fetchComplex();
+    }
+
+    string fetchComplex() {
+        if (idx >= (int)raw.size()) return "";
+
+        skipSpacesComplex();
+
+        if (idx >= (int)raw.size()) return "";
+
+        char ch = raw[idx];
+
+        if (isValidIdStartComplex(ch)) {
+            return parseIdentifierComplex();
+        } else if (isDigit(ch) || isDot(ch)) {
+            return parseNumberComplex();
+        } else if (isRelOp(ch)) {
+            return parseRelOpComplex();
+        } else if (isLogOp(ch)) {
+            return parseLogOpComplex();
+        } else if (isSymbol(ch)) {
+            return parseSymbolComplex();
+        } else {
+            throw LexicalError("Unrecognizable characters.");
+        }
+    }
+
+    void skipSpacesComplex() {
+        while (idx < (int)raw.size() && isSpace(raw[idx])) {
+            ++idx;
+        }
+    }
+
+    bool isValidIdStartComplex(char c) {
+        return isLetter(c) || isUnderscore(c);
+    }
+
+    bool isValidIdCharComplex(char c) {
+        return isDigitOrLetter(c);
+    }
+
+    string parseIdentifierComplex() {
+        string token;
+        while (idx < (int)raw.size() && isValidIdCharComplex(raw[idx])) {
+            token += raw[idx++];
+        }
+        return token;
+    }
+
+    string parseNumberComplex() {
+        string token;
+        while (idx < (int)raw.size() && (isDigit(raw[idx]) || isDot(raw[idx]))) {
+            token += raw[idx++];
+        }
+        return token;
+    }
+
+    string parseRelOpComplex() {
+        string token;
+        token += raw[idx++];
+        if (idx < (int)raw.size() && raw[idx] == '=') {
+            token += raw[idx++];
+        }
+        return token;
+    }
+
+    string parseLogOpComplex() {
+        string token;
+        token += raw[idx++];
+        if (idx < (int)raw.size() && raw[idx] == token[0]) {
+            token += raw[idx++];
+        }
+        return token;
+    }
+
+    string parseSymbolComplex() {
+        return string(1, raw[idx++]);
+    }
+
+    void checkDecimalPointPosition(const string& token) {
+        if (token.front() == '.' || token.back() == '.') {
+            throw LexicalError("Malformed number: Decimal point at the beginning or end of a floating point number.");
+        }
+    }
+
+    void checkLeadingZero(const string& token) {
+        if (token[0] == '0' && token.length() > 1 && token[1] != '.') {
+            throw LexicalError("Malformed number: Leading zeros in an integer.");
+        }
+    }
+
+    void checkCharacters(const string& token) {
+        for (char ch : token) {
+            if (ch != '.' && !isDigit(ch)) {
+                throw LexicalError("Malformed number: Non-digit character in a number.");
+            }
+        }
+    }
+
+    void checkMultipleDecimalPoints(const string& token) {
+        bool seen_dot = false;
+        for (char ch : token) {
+            if (ch == '.') {
+                if (seen_dot) {
+                    throw LexicalError("Malformed number: More than one decimal point in a floating point number.");
+                }
+                seen_dot = true;
+            }
+        }
+    }
+
+    void mark(string& token) {
+        string type;
+
+        if (dict1.count(token)) {
+            type = dict1.at(token);
+        } else if (dict2.count(token)) {
+            type = dict2.at(token);
+        } else if (isLetter(token[0]) || isUnderscore(token[0])) {
+            type = "IDENT";
+        } else if (isDigit(token[0]) || token[0] == '.') {
+            checkDecimalPointPosition(token);
+            checkLeadingZero(token);
+            checkCharacters(token);
+            checkMultipleDecimalPoints(token);
+
+            bool seen_dot = false;
+            for (char ch : token) {
+                if (ch == '.') {
+                    seen_dot = true;
+                    break;
+                }
+            }
+            type = seen_dot ? "DOUBLE" : "INT";
+        } else {
+            throw LexicalError("Unknown token: " + token);
+        }
+
+        records.emplace_back(token, type);
+    }
+};
+
+int main() {
+    try {
+        Scanner s;
+        s.run();
+    } catch (const LexicalError& err) {
+        cout << err.what() << endl;
+        return 0;
+    } catch (const exception& e) {
+        cout << "Unexpected Error: " << e.what() << endl;
+        return 1;
+    }
+
+    return 0;
+}
