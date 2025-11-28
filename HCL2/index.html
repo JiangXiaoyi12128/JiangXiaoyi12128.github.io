@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraduPro 批判性反馈报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9fafb;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: #1f2937;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            color: #4b5563;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+            line-height: 1.8;
+        }
+
+        strong {
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        em {
+            font-style: italic;
+            color: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background-color: #e5e7eb;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #d1d5db;
+            color: #1f2937;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        tr:hover {
+            background-color: #f3f4f6;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 30px 0;
+        }
+
+        .section {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .problem-box {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .solution-box {
+            background-color: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .improvement-box {
+            background-color: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .category-label {
+            display: inline-block;
+            background-color: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .severity-high {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .severity-medium {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 20px;
+            margin-left: 0;
+            margin-bottom: 15px;
+            color: #555;
+            font-style: italic;
+        }
+
+        code {
+            background-color: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d97706;
+        }
+
+        .page-break {
+            page-break-after: always;
+            margin-bottom: 40px;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+            }
+            .section {
+                box-shadow: none;
+                border: 1px solid #e5e7eb;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.4em;
+            }
+
+            h3 {
+                font-size: 1.2em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 标题 -->
+        <h1>P10. Critique Feedback: Wireframe</h1>
+
+        <!-- 项目提案部分 -->
+        <div class="section">
+            <h2>毕业设计管理系统 (GraduPro) 项目提案</h2>
+            
+            <p>GraduPro 旨在打造一个以"简化毕业设计流程"为核心目标的任务导向型工具应用，专注于满足学生用户在选题、任务跟踪及导师协作等方面的核心需求。该设计强调信息层级的清晰化与操作的高效性，通过运用色彩心理学（例如，蓝色传递专业性、红色提示紧迫性）与扁平化的视觉语言，致力于构建一个简洁直观的用户体验。在用户需求优先级方面，系统将任务提醒、日程管理及选题决策作为重点功能，并辅以个性化的问候与清晰的导航设计，以期降低用户的认知负荷，提升功能的整体可访问性。</p>
+
+            <p>系统的用户界面主要由启动页、计划安排页、用户主页及选题大厅四个核心部分构成。各界面元素布局严格遵循移动端交互设计规范，在信息密度与视觉留白之间寻求平衡，以确保整体的视觉流畅性与操作舒适度。</p>
+
+            <h3>批判性反馈网站链接</h3>
+            <p><strong>说明:</strong> 本次批判性反馈于线下课堂进行，由同行同学以小组形式对线框图(Wireframe)原型进行评审。所有反馈意见均已在下方报告中进行汇总、分类和分析。</p>
+        </div>
+
+        <hr>
+
+        <!-- 批判性反馈报告 -->
+        <h1>批判性反馈报告</h1>
+
+        <!-- 第一部分：整体陈述 -->
+        <div class="section">
+            <h2>1. 整体陈述 (Overall Statement)</h2>
+            
+            <p>本次收集到的同行评审反馈整体基调是积极且富有建设性的。同学们普遍认可GraduPro应用的核心价值和设计方向，认为其切中了毕业设计过程中的关键痛点。反馈主要聚焦于提升界面的信息传达清晰度、优化核心任务的交互流程以及增强视觉设计的一致性与引导性，旨在帮助产品进一步提升用户体验和可用性。问题的严重程度主要集中在"高"和"中"两个级别，表明线框图在关键功能和交互细节上仍有较大的优化空间。</p>
+        </div>
+
+        <!-- 第二部分：已识别问题 -->
+        <div class="section">
+            <h2>2. 已识别问题、解决方案及预期改进</h2>
+            
+            <p>我们根据问题的性质将其归纳为四大类别，并对每个问题进行了详细分析，提出了相应的解决方案和预期改进效果。</p>
+
+            <!-- 信息架构与导航 -->
+            <h3>信息架构与导航</h3>
+
+            <div class="problem-box">
+                <h4>问题1.1: 主界面功能区图标仅为"ICON"占位符，功能指示不明确</h4>
+                <p><strong>来源与严重程度:</strong> 3位同学提出，<span class="severity-high">高</span></p>
+            </div>
+
+            <h4>解决方案</h4>
+            <ol>
+                <li>为"选题大厅"、"我的导师"、"计划安排"、"我的文档"等核心功能设计一套表意明确、风格统一的图标。</li>
+                <li>在图标下方保留简短的文字标签作为补充说明。</li>
+            </ol>
+
+            <div class="improvement-box">
+                <strong>预期改进:</strong> 用户能够快速理解并访问各项核心功能，显著降低学习成本和操作疑虑，提升导航效率。
+            </div>
+
+            <hr>
+
+            <div class="problem-box">
+                <h4>问题1.2: 底部导航栏仅有文字，缺少图标辅助，识别效率低</h4>
+                <p><strong>来源与严重程度:</strong> 2位同学提出，<span class="severity-medium">中</span></p>
+            </div>
+
+            <h4>解决方案</h4>
+            <p>为"主页"、"流程"、"消息"、"我的"四个导航标签分别匹配标准化的、易于识别的图标，形成图文结合的导航样式。</p>
+
+            <div class="improvement-box">
+                <strong>预期改进:</strong> 增强导航栏的视觉吸引力和可读性，符合主流App设计规范，让用户在不同页面间切换时更加自如。
+            </div>
+
+            <!-- 视觉设计与一致性 -->
+            <h3>视觉设计与一致性</h3>
+
+            <div class="problem-box">
+                <h4>问题2.1: 主界面"提交开题报告"任务卡的视觉层级不足，紧迫感不强</h4>
+                <p><strong>来源与严重程度:</strong> 4位同学提出，<span class="severity-high">高</span></p>
+            </div>
+
+            <h4>解决方案</h4>
+            <ol>
+                <li>增强倒计时（如"3天12小时45分钟"）的视觉效果，例如使用更醒目的颜色或更大的字号。</li>
+                <li>为整个任务卡片增加微妙的阴影或边框效果，使其在视觉上更具"卡片感"，从背景中脱颖而出。</li>
+            </ol>
+
+            <div class="improvement-box">
+                <strong>预期改进:</strong> 关键任务的视觉优先级被显著提高，能有效吸引用户注意力，强化任务的紧迫性，从而降低任务被遗忘的风险。
+            </div>
+
+            <hr>
+
+            <div class="problem-box">
+                <h4>问题2.2: 选题大厅中"名额已满"的状态没有在线框图中明确展示</h4>
+                <p><strong>来源与严重程度:</strong> 3位同学提出，<span class="severity-high">高</span></p>
+            </div>
+
+            <h4>解决方案</h4>
+            <ol>
+                <li>对于名额已满的课题，将"选择此题"按钮明确置为灰色，并添加"名额已满"的文字提示。</li>
+                <li>按钮的点击状态设置为禁用，防止用户进行无效操作。</li>
+            </ol>
+
+            <div class="improvement-box">
+                <strong>预期改进:</strong> 用户可以一目了然地识别出哪些课题已无法选择，避免了无效的尝试和潜在的挫败感，优化了选题流程的效率。
+            </div>
+
+            <!-- 交互设计与反馈 -->
+            <h3>交互设计与反馈</h3>
+
+            <div class="problem-box">
+                <h4>问题3.1: "计划安排"中通过"+"按钮创建任务后，缺少明确的保存或取消操作</h4>
+                <p><strong>来源与严重程度:</strong> 2位同学提出，<span class="severity-medium">中</span></p>
+            </div>
+
+            <h4>解决方案</h4>
+            <p>在任务创建/编辑界面底部增加"保存"和"取消"两个独立的操作按钮，让用户可以明确地确认或放弃当前操作。</p>
+
+            <div class="improvement-box">
+                <strong>预期改进:</strong> 提供了清晰的操作出口，给予用户充分的控制权，避免因误操作导致的数据丢失或意外创建，使交互流程更加完整和健壮。
+            </div>
+
+            <hr>
+
+            <div class="problem-box">
+                <h4>问题3.2: 缺少对空状态（如无任务）和错误状态（如网络中断）的界面设计</h4>
+                <p><strong>来源与严重程度:</strong> 1位同学提出，<span class="severity-medium">中</span></p>
+            </div>
+
+            <h4>解决方案</h4>
+            <ol>
+                <li><strong>空状态:</strong> 在"计划安排"或"消息"列表为空时，设计友好的提示性插图和文字，如"今天没有安排，轻松一下吧！"。</li>
+                <li><strong>错误状态:</strong> 设计网络连接失败或加载错误时的提示页面，并提供"点击重试"按钮。</li>
+            </ol>
+
+            <div class="improvement-box">
+                <strong>预期改进:</strong> 提升了应用的容错能力和情感化体验。即使用户处于非理想场景（无数据或网络错误），系统也能提供清晰的指引和积极的反馈。
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- 第三部分：总结与预期改进 -->
+        <div class="section">
+            <h2>3. 总结与预期改进 (Expected Improvement)</h2>
+            
+            <p>通过解决上述一系列问题，GraduPro系统的整体用户体验将得到显著提升。首先，导航清晰性的改善将使用户能够更快速、更直观地找到所需功能，降低认知负荷。其次，视觉引导和反馈的强化将确保用户能够准确感知任务的优先级和状态，从而更高效地完成操作。最后，交互流程的完整性和对异常状态的周全考虑，将使应用在各种场景下都表现得更加稳定和可靠。</p>
+
+            <p>综合来看，这些改进将共同推动GraduPro从一个功能可用的线框图原型，向一个体验流畅、直观易用的成熟产品迈进。</p>
+        </div>
+
+        <!-- 页脚 -->
+        <hr>
+        <p style="text-align: center; color: #999; font-size: 0.9em; margin-top: 40px;">
+            本报告由同行评审小组汇总整理 | 最后更新: 2024年
+        </p>
+    </div>
+</body>
+</html>
